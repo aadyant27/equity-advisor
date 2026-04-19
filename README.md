@@ -49,3 +49,11 @@ langchain-postgres ← Python library, speaks LangChain
 psycopg2 ← Python library, speaks PostgreSQL
 ↓
 PostgreSQL + pgvector ← database with vector search built in
+
+# Setting up .env file
+
+API_KEY=your_llm-api_key_here
+LANGCHAIN_API_KEY=your_langsmith_key_here - Go to `smith.langchain.com`. For agent tracing
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_PROJECT=equity-advisor
+DATABASE_URL=postgresql://localhost/equity_advisor
