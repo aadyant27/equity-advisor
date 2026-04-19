@@ -108,9 +108,9 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/equity_advisor
 
 ### What each flag does:
 
--d — runs the container in the background so it doesn't block your terminal
---name equity-advisor-db — gives the container a name so you can refer to it easily instead of a random ID
--e POSTGRES_PASSWORD=password — sets the database password
--e POSTGRES_DB=equity_advisor — creates a database called equity_advisor automatically on first run
--p 5432:5432 — maps port 5432 on your machine to port 5432 inside the container. Your Python code connects to localhost:5432 and Docker forwards it to the container
-pgvector/pgvector:pg15 — the image to use, PostgreSQL 15 with pgvector included
+- -d — runs the container in the background so it doesn't block your terminal
+- --name equity-advisor-db — gives the container a name so you can refer to it easily instead of a random ID
+- -e POSTGRES_PASSWORD=password — sets the database password
+- -e POSTGRES_DB=equity_advisor — creates a database called equity_advisor automatically on first run
+- -p 5432:5432 — maps port 5432 on your machine to port 5432 inside the container. Your Python code connects to localhost:5432 and Docker forwards it to the container
+- pgvector/pgvector:pg15 — the image to use, PostgreSQL 15 with pgvector included
