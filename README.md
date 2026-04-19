@@ -20,9 +20,9 @@
 
 - langgraph — the core framework for building our multi-agent pipeline. It lets us define agents as nodes in a graph, connect them with edges, and control the flow between them including the **interrupt/resume pattern**.
 
-- langchain and langchain-anthropic — LangChain is the toolkit that connects LLMs to everything else — vector databases, document loaders, retrievers. langchain-anthropic is specifically the Claude integration.
+- langchain and langchain-anthropic/langchain-openai — LangChain is the toolkit that connects LLMs to everything else — vector databases, document loaders, retrievers. langchain-anthropic is specifically the Claude integration.
 
-- anthropic — the official Anthropic SDK. This is what actually calls the Claude API for tool use inside the ingestion agent.
+- openAI/anthropic — the official Anthropic SDK. This is what actually calls the Claude API for tool use inside the ingestion agent.
 
 - langchain-postgres — connects LangChain's RAG retrieval to PostgreSQL with pgvector. This is how we store and search tax rule embeddings.
 
