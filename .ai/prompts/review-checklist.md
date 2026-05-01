@@ -26,3 +26,4 @@
 - [ ] No placeholder comments like "implement this later"
 - [ ] No hardcoded API keys
 - [ ] Docstrings on every class and function
+- [ ] No deprecated Python patterns (e.g. datetime.utcnow() → datetime.now(timezone.utc))
