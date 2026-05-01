@@ -13,6 +13,7 @@
 - [ ] Only imports what it uses
 - [ ] Imports from correct local modules
 - [ ] No missing imports
+- [ ] Import paths match actual filenames on disk — verify no \_agent suffix added to module names that don't have it
 
 ### Agent specific
 
