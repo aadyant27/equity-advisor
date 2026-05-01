@@ -80,6 +80,10 @@ returns: { resumed: true }
 GET /api/report/{run_id}
 returns: { markdown: str, risk_scores: RiskScores }
 
+strategy_agent → consumes grant_data + risk_scores + tax_research,
+calls GPT-4o, returns prioritised exercise plan
+with citations, minimum 3 action items
+
 ## Acceptance criteria
 
 [ ] All GrantData fields extracted from a sample PDF text
