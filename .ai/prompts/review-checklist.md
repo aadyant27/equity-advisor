@@ -28,3 +28,13 @@
 - [ ] No hardcoded API keys
 - [ ] Docstrings on every class and function
 - [ ] No deprecated Python patterns (e.g. datetime.utcnow() → datetime.now(timezone.utc))
+
+"Library version compatibility":
+
+- [ ] For any new library import, verify the class/function
+      actually exists in the installed version before approving
+      Run: python3 -c "from module import ClassName; print('ok')"
+- [ ] LangGraph specific — NodeInterrupt is in langgraph.errors
+- [ ] LangGraph specific — interrupt and Command are in langgraph.types
+- [ ] If a library was recently installed, check its version with
+      pip show <library> and cross-reference with its changelog

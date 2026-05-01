@@ -12,7 +12,7 @@ from backend.agents.state import AgentState, GrantData, RiskScores
 load_dotenv()
 
 _client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
-_ACTION_ITEM_RE = re.compile(r"^\s*(\d+[.)]\s+|[-*]\s+)", re.MULTILINE)
+_ACTION_ITEM_RE = re.compile(r"^\s*(\d+[.)]\s*|[-*]\s*)", re.MULTILINE)
 
 
 def _build_system_prompt() -> str:
@@ -21,7 +21,15 @@ def _build_system_prompt() -> str:
         "You are a senior equity compensation advisor. "
         "Given a client's grant details, risk scores, and relevant tax research, "
         "produce a prioritised exercise strategy. "
-        "Your response must contain at least 3 numbered action items, each with a clear rationale. "
+        "You MUST format your response as a numbered list starting with 1., 2., 3. "
+        "Each item must have a clear rationale. "
+        "Example format:\n"
+        "1. Exercise 25% of vested ISOs before December 31 to stay within the AMT exemption threshold. "
+        "[Research 1] confirms the 2024 exemption is $85,700 for single filers.\n"
+        "2. Sell RSU shares immediately at vest to reduce concentration below the 15% threshold. "
+        "[Research 3] outlines the risks of single-stock concentration above this level.\n"
+        "3. Establish a 10b5-1 plan during the next open trading window to automate future sales.\n"
+        "Your response will be rejected if it does not contain at least 3 numbered action items. "
         "Cite the provided research chunks using their [Research N] labels where relevant. "
         "Be specific about timing, tax implications, and dollar amounts. "
         "Do not include any personally identifiable information."

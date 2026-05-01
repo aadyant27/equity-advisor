@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from langgraph.checkpoint.memory import MemorySaver
-from langgraph.types import Command, NodeInterrupt
+from langgraph.errors import NodeInterrupt
+from langgraph.types import Command
 from pydantic import BaseModel
 
 from backend.agents.graph import build_graph
@@ -90,19 +91,44 @@ def stream(run_id: str) -> StreamingResponse:
     state = _runs[run_id]
 
     def event_generator():
+        completed = False
         try:
             for chunk in _graph.stream(
                 state,
                 config={"configurable": {"thread_id": run_id}},
             ):
-                for node_name, node_output in chunk.items():
+                if isinstance(chunk, tuple):
+                    node_name, node_output = chunk
+                elif isinstance(chunk, dict):
+                    for node_name, node_output in chunk.items():
+                        pass
+                else:
+                    continue
+
+                if node_name == "__interrupt__":
                     event = AgentEvent(
-                        agent=node_name,
-                        status="running",
-                        output=node_output.get("agent_log", []),
+                        agent="human_review",
+                        status="interrupt",
+                        output=[],
                         timestamp=datetime.now(timezone.utc).isoformat(),
                     )
                     yield f"data: {event.model_dump_json()}\n\n"
+                    return
+
+                if isinstance(node_output, dict):
+                    output = node_output.get("agent_log", [])
+                else:
+                    output = []
+
+                event = AgentEvent(
+                    agent=node_name,
+                    status="running",
+                    output=output,
+                    timestamp=datetime.now(timezone.utc).isoformat(),
+                )
+                yield f"data: {event.model_dump_json()}\n\n"
+
+            completed = True
         except NodeInterrupt:
             event = AgentEvent(
                 agent="human_review",
@@ -113,13 +139,14 @@ def stream(run_id: str) -> StreamingResponse:
             yield f"data: {event.model_dump_json()}\n\n"
             return
 
-        event = AgentEvent(
-            agent="report_agent",
-            status="done",
-            output=[],
-            timestamp=datetime.now(timezone.utc).isoformat(),
-        )
-        yield f"data: {event.model_dump_json()}\n\n"
+        if completed:
+            event = AgentEvent(
+                agent="report_agent",
+                status="done",
+                output=[],
+                timestamp=datetime.now(timezone.utc).isoformat(),
+            )
+            yield f"data: {event.model_dump_json()}\n\n"
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

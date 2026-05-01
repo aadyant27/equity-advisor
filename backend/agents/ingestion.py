@@ -83,7 +83,10 @@ _SYSTEM_PROMPT = (
     "Extract equity grant information from the provided document text. "
     "For each field assign a confidence score between 0.0 and 1.0 in confidence_per_field "
     "reflecting how certain you are the value is correct. "
-    "Use 1.0 only when the value is stated explicitly and unambiguously."
+    "Use 1.0 only when the value is stated explicitly and unambiguously. "
+    "confidence_per_field is REQUIRED and must contain a score for every single field in the response: "
+    "grant_type, grant_date, expiration_date, total_shares, vested_shares, strike_price, current_fmv, and company_name. "
+    "If confidence_per_field is missing or empty, the extraction is considered failed."
 )
 
 
@@ -113,13 +116,25 @@ def ingestion_agent(state: AgentState) -> AgentState:
     except json.JSONDecodeError as exc:
         raise RuntimeError(f"ingestion_agent: failed to parse tool arguments — {exc}") from exc
 
+    if "confidence_per_field" not in arguments or not arguments["confidence_per_field"]:
+        arguments["confidence_per_field"] = {
+            "grant_type": 0.5,
+            "grant_date": 0.5,
+            "expiration_date": 0.5,
+            "total_shares": 0.5,
+            "vested_shares": 0.5,
+            "strike_price": 0.5,
+            "current_fmv": 0.5,
+            "company_name": 0.5,
+        }
+
     try:
         grant_data = GrantData(**arguments)
     except Exception as exc:
         raise RuntimeError(f"ingestion_agent: GrantData validation failed — {exc}") from exc
 
     confidence_values = list(grant_data.confidence_per_field.values())
-    avg_confidence = sum(confidence_values) / len(confidence_values) if confidence_values else 0.0
+    avg_confidence = sum(confidence_values) / len(confidence_values)
 
     log_entry = (
         f"[{datetime.now(timezone.utc).isoformat()}] ingestion_agent: "
