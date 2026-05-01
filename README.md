@@ -90,11 +90,13 @@ PostgreSQL + pgvector ← database with vector search built in
 
 # Setting up .env file
 
+```
 API_KEY=your_llm-api_key_here
 LANGCHAIN_API_KEY=your_langsmith_key_here - Go to `smith.langchain.com`. For agent tracing
 LANGCHAIN_TRACING_V2=true
 LANGCHAIN_PROJECT=equity-advisor
 DATABASE_URL=postgresql://postgres:password@localhost:5432/equity_advisor
+```
 
 ## Setting up Postgres via docker
 
@@ -114,3 +116,20 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/equity_advisor
 - -e POSTGRES_DB=equity_advisor — creates a database called equity_advisor automatically on first run
 - -p 5432:5432 — maps port 5432 on your machine to port 5432 inside the container. Your Python code connects to localhost:5432 and Docker forwards it to the container
 - pgvector/pgvector:pg15 — the image to use, PostgreSQL 15 with pgvector included
+
+## Enable pgvector extension
+
+```
+docker exec -it equity-advisor-db psql -U postgres -d equity_advisor
+```
+
+Then inside psql:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS vector;
+\q
+```
+
+- This activated the pgvector extension inside the equity_advisor database. PostgreSQL extensions are like plugins — they add new capabilities. The vector extension adds a new column type called vector and teaches PostgreSQL how to do similarity search on it.
+- Without this command, pgvector is installed on the system but not active in your specific database.
+- IF NOT EXISTS means if it's already been created, don't throw an error — just skip it silently. Safe to run multiple times.

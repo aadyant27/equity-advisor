@@ -16,3 +16,6 @@ dist/
 
 # os files
 .DS_Store
+
+# Specific to this project
+implementation-trace.md
